@@ -1,0 +1,158 @@
+import sys
+import numpy as np
+import pygame
+from pygame.locals import *
+
+
+def make_matrix(player):
+    b = [f'{i:02}' for i in range(1, 21)]  # B contains numbers 1 to 20
+    i = [f'{i:02}' for i in range(21, 41)]  # I contains numbers 21 to 40
+    n = [f'{i:02}' for i in range(41, 61)]  # N contains numbers 41 to 60
+    g = [f'{i:02}' for i in range(61, 81)]  # G contains numbers 61 to 80
+    o = [f'{i:02}' for i in range(81, 100)]  # O contains numbers 81 to 100
+
+    # bingo card will be 5x5
+    col_1 = []; row_1 = []
+    col_2 = []; row_2 = []
+    col_3 = []; row_3 = []
+    col_4 = []; row_4 = []
+    col_5 = []; row_5 = []
+
+    cols = [col_1, col_2, col_3, col_4, col_5]
+    rows = [row_1, row_2, row_3, row_4, row_5]
+
+    # each letter in bingo is a column
+    letters = [b, i, n, g, o]
+
+    for let in letters:
+
+        for count in range(0, 5):
+
+            random = np.random.choice(let)
+            let.remove(random)
+
+            if let is b:
+
+                col_1.append(random)
+
+            elif let is i:
+
+                col_2.append(random)
+
+            elif let is n:
+
+                if count == 2:
+
+                    col_3.append('--')  # the middle space of the bingo card is already complete
+
+                else:
+
+                    col_3.append(random)
+
+            elif let is g:
+
+                col_4.append(random)
+
+            elif let is o:
+
+                col_5.append(random)
+
+    for r in rows:
+
+        for c in cols:
+
+            r.append(c[rows.index(r)])
+
+    # print the bingo card
+    print(f"\nPlayer {player+1}:")
+    print("|   B     I     N     G     O  |")
+    print(f"|{row_1}|\n|{row_2}|\n|{row_3}|\n|{row_4}|\n|{row_5}|")
+
+
+def player_number():
+    # display prompt for user
+    screen.blit(text2, textRect2)
+    pygame.display.update()
+
+    entered = False  # false until user has entered a number
+
+    while not entered:
+        for event in pygame.event.get():
+
+            if event.type == KEYDOWN:
+
+                num = event.unicode
+
+                entered = True
+
+    # clear screen
+    screen.fill((0, 0, 0))
+
+    screen.blit(text3, textRect3)
+    pygame.display.update()
+    
+    return int(num)
+
+
+pygame.init()
+
+''''numbers'''
+numbers = [f'{i:02}' for i in range(1, 100)]
+
+'''colours'''
+colours = [i for i in range(0, 256)]
+
+'''screen'''
+X = 600; Y = 600
+screen = pygame.display.set_mode((X, Y))
+
+'''text'''
+pygame.display.set_caption('BINGO!')
+font1 = pygame.font.Font('OCRAEXT.TTF', 300)
+font2 = pygame.font.Font('OCRAEXT.TTF', 25)
+text = font1.render('', True, (0, 0, 0))
+textRect = text.get_rect(center=(120, 300))
+text2 = font2.render("How many players are there? ", True, (0, 80, 0))
+textRect2 = text2.get_rect(center=(275, 300))
+text3 = font2.render("Press spacebar to generate number", True, (0, 80, 0))
+textRect3 = text3.get_rect(center=(300, 300))
+
+'''players'''
+players = player_number()
+for p in range(0, players):
+    make_matrix(p)
+
+while True:
+
+    screen.blit(text, textRect)
+
+    for event in pygame.event.get():
+
+        index1 = (np.random.choice(colours))
+        index2 = (np.random.choice(colours))
+        index3 = (np.random.choice(colours))
+        colour1 = (index1, index2, index3)
+        colour2 = (255 - index1, 255 - index2, 255 - index3)
+
+        if event.type == KEYDOWN:
+
+            if event.key == K_SPACE:
+
+                if numbers is not None:
+
+                    random_num = np.random.choice(numbers)
+                    numbers.remove(random_num)
+                    screen.fill((0, 0, 0))
+                    pygame.draw.circle(screen, colour2, (300, 300), 200)
+                    text = font1.render(random_num, True, colour1)
+
+            elif event.key == K_BACKSPACE or event.key == K_ESCAPE:
+
+                pygame.quit()
+                sys.exit()
+
+        elif event.type == QUIT:
+
+            break
+
+        pygame.display.update()
